@@ -13,10 +13,6 @@ plugins {
     id("maven-publish")
 }
 
-var groupId = "io.olvid.daemon"
-var artifactId = "client"
-var version = "2.0.1-alpha"
-
 var protobufVersion = "4.33.0"
 var grpcVersion = "1.78.0"
 
@@ -68,19 +64,11 @@ tasks.withType<Test> {
 // publication details
 publishing {
     publications {
-        create<MavenPublication>("maven") {
-            groupId = groupId
-            artifactId = artifactId
-            version = version
-
-            from(components["java"])
-        }
-    }
-
-    publications {
         create<MavenPublication>("mavenJava") {
             pom {
                 name = "Olvid Bot Java Client"
+                groupId = providers.gradleProperty("groupId").get()
+                artifactId = providers.gradleProperty("artifactId").get()
                 description = "A grpc client implementation to interact with an Olvid Daemon"
                 url = "https://doc.bot.olvid.io"
                 developers {
@@ -89,6 +77,8 @@ publishing {
                     }
                 }
             }
+
+            from(components["java"])
         }
     }
 }

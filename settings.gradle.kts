@@ -1,1 +1,0 @@
-rootProject.name = "Olvid Bot Java Client"
