@@ -7,13 +7,13 @@ repositories {
 
 plugins {
     id("java")
-    id("application")
     id("build.buf") version "0.10.2"
     id("maven-publish")
 }
 
-group = "io.olvid.daemon"
-version = "2.0.0-alpha"
+var groupId = "io.olvid.daemon"
+var artifactId = "client"
+var version = "2.0.1-alpha"
 
 var protobufVersion = "4.33.0"
 var grpcVersion = "1.78.0"
@@ -28,13 +28,6 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:6.0.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-// configure application plugin (to run module as main)
-apply { plugin("java") }
-
-application {
-    mainClass = "io.olvid.daemon.java.main.Main"
 }
 
 // configure buf plugin
@@ -74,9 +67,9 @@ tasks.withType<Test> {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "io.olvid.daemon"
-            artifactId = "client"
-            version = "2.0.1-SNAPSHOT"
+            groupId = groupId
+            artifactId = artifactId
+            version = version
 
             from(components["java"])
         }
