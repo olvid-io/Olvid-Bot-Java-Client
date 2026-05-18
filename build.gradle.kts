@@ -9,6 +9,7 @@ plugins {
     id("java")
     id("application")
     id("build.buf") version "0.10.2"
+    id("maven-publish")
 }
 
 group = "io.olvid.daemon"
@@ -67,4 +68,32 @@ sourceSets["main"].java {
 // setup tests
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+// publication details
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "io.olvid.daemon"
+            artifactId = "client"
+            version = "2.0.1-SNAPSHOT"
+
+            from(components["java"])
+        }
+    }
+
+    publications {
+        create<MavenPublication>("mavenJava") {
+            pom {
+                name = "Olvid Bot Java Client"
+                description = "A grpc client implementation to interact with an Olvid Daemon"
+                url = "https://doc.bot.olvid.io"
+                developers {
+                    developer {
+                        email = "bot@olvid.io"
+                    }
+                }
+            }
+        }
+    }
 }

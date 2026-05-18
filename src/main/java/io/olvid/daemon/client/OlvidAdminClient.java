@@ -1,4 +1,4 @@
-package io.olvid.daemon.java.client;
+package io.olvid.daemon.client;
 
 import io.grpc.*;
 import io.olvid.daemon.services.v1.*;

@@ -1,4 +1,4 @@
-package io.olvid.daemon.java.client;
+package io.olvid.daemon.client;
 
 import io.olvid.daemon.admin.v1.*;
 import io.olvid.daemon.command.v1.*;
