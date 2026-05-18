@@ -22,6 +22,7 @@ dependencies {
     api("io.grpc:grpc-protobuf:${grpcVersion}")
     api("io.grpc:grpc-stub:${grpcVersion}")
     implementation("io.grpc:grpc-okhttp:${grpcVersion}")
+    implementation("org.slf4j:slf4j-api:2.0.17")
 
     testImplementation(platform("org.junit:junit-bom:6.0.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")

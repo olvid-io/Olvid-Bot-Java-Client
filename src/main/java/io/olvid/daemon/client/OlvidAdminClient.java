@@ -8,10 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OlvidAdminClient {
-	private static final Logger LOGGER = Logger.getLogger(OlvidAdminClient.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(OlvidAdminClient.class);
 
 	public final String clientKey;
 	public final String daemonUrl;
@@ -71,45 +72,42 @@ public class OlvidAdminClient {
 		// determine the client key to use (argument > env > file)
 		if (clientKey != null) {
 			this.clientKey = clientKey;
-			LOGGER.info("Used argument client key");
+			LOGGER.debug("Using admin client key from builder argument");
 		} else if (System.getenv("OLVID_ADMIN_CLIENT_KEY") != null && !System.getenv("OLVID_ADMIN_CLIENT_KEY").isEmpty()) {
 			this.clientKey = System.getenv("OLVID_ADMIN_CLIENT_KEY");
-			LOGGER.info("Used environment client key");
-		}
-		else if (dotEnv.containsKey("OLVID_ADMIN_CLIENT_KEY")) {
+			LOGGER.debug("Using admin client key from OLVID_ADMIN_CLIENT_KEY environment variable");
+		} else if (dotEnv.containsKey("OLVID_ADMIN_CLIENT_KEY")) {
 			this.clientKey = dotEnv.getProperty("OLVID_ADMIN_CLIENT_KEY");
-			LOGGER.info("Used .env client key");
+			LOGGER.debug("Using admin client key from .env file");
 		} else {
-			throw new RuntimeException("No client key provided");
+			throw new IllegalStateException("No admin client key provided: set it via the builder, the OLVID_ADMIN_CLIENT_KEY environment variable, or a .env file");
 		}
 
 		// determine daemonUrl
 		if (daemonUrl != null) {
-			LOGGER.info("Used argument daemon url");
+			LOGGER.debug("Using daemon URL from builder argument: {}", daemonUrl);
 		} else if (System.getenv("OLVID_DAEMON_URl") != null && !System.getenv("OLVID_DAEMON_URl").isEmpty()) {
 			daemonUrl = System.getenv().get("OLVID_DAEMON_URl");
-			LOGGER.info("Used environment daemon url");
+			LOGGER.debug("Using daemon URL from OLVID_DAEMON_URl environment variable: {}", daemonUrl);
 		} else if (dotEnv.containsKey("OLVID_DAEMON_URl")) {
-			daemonUrl =  dotEnv.getProperty("OLVID_DAEMON_URl");
-			LOGGER.info("Used .env daemon url");
+			daemonUrl = dotEnv.getProperty("OLVID_DAEMON_URl");
+			LOGGER.debug("Using daemon URL from .env file: {}", daemonUrl);
 		} else {
 			daemonUrl = "127.0.0.1:50051";
-			LOGGER.info("Used default daemon url");
+			LOGGER.debug("No daemon URL configured, using default: {}", daemonUrl);
 		}
 
 		// handle grpc channel credentials
 		if (channelCredentials != null) {
 			this.channelCredentials = channelCredentials;
-			LOGGER.info("Used argument credentials");
-		}
-		// create default credentials
-		else {
+			LOGGER.debug("Using channel credentials from builder argument");
+		} else {
 			if (daemonUrl.startsWith("https://")) {
 				this.channelCredentials = TlsChannelCredentials.create();
-				LOGGER.info("Used default TLS credentials");
+				LOGGER.debug("Using TLS credentials (daemon URL starts with https://)");
 			} else {
 				this.channelCredentials = InsecureChannelCredentials.create();
-				LOGGER.info("Used default insecure credentials");
+				LOGGER.debug("Using insecure credentials (daemon URL does not start with https://)");
 			}
 		}
 
