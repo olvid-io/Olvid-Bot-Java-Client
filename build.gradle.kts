@@ -8,7 +8,7 @@ repositories {
 java.sourceCompatibility = JavaVersion.VERSION_21
 
 plugins {
-    id("java")
+    id("java-library")
     id("build.buf") version "0.10.2"
     id("maven-publish")
 }
@@ -17,10 +17,10 @@ var protobufVersion = "4.33.0"
 var grpcVersion = "1.78.0"
 
 dependencies {
-    implementation("com.google.protobuf:protobuf-java:${protobufVersion}")
-    implementation("io.grpc:grpc-core:${grpcVersion}")
-    implementation("io.grpc:grpc-protobuf:${grpcVersion}")
-    implementation("io.grpc:grpc-stub:${grpcVersion}")
+    api("com.google.protobuf:protobuf-java:${protobufVersion}")
+    api("io.grpc:grpc-core:${grpcVersion}")
+    api("io.grpc:grpc-protobuf:${grpcVersion}")
+    api("io.grpc:grpc-stub:${grpcVersion}")
     implementation("io.grpc:grpc-okhttp:${grpcVersion}")
 
     testImplementation(platform("org.junit:junit-bom:6.0.3"))
