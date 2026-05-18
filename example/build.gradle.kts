@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation("com.github.olvid-io:Olvid-Bot-Java-Client:307c7bb")
+    implementation("com.github.olvid-io:Olvid-Bot-Java-Client:2.0.1")
 }
 
 // configure application plugin (to run module as main)
