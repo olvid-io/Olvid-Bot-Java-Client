@@ -5,6 +5,8 @@ repositories {
     mavenCentral()
 }
 
+java.sourceCompatibility = JavaVersion.VERSION_21
+
 plugins {
     id("java")
     id("build.buf") version "0.10.2"
