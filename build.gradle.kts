@@ -64,21 +64,29 @@ tasks.withType<Test> {
 // publication details
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
-            pom {
-                name = "Olvid Bot Java Client"
-                groupId = providers.gradleProperty("groupId").get()
-                artifactId = providers.gradleProperty("artifactId").get()
-                description = "A grpc client implementation to interact with an Olvid Daemon"
-                url = "https://doc.bot.olvid.io"
-                developers {
-                    developer {
-                        email = "bot@olvid.io"
-                    }
-                }
-            }
+        create<MavenPublication>("maven") {
+            groupId = providers.gradleProperty("groupId").get()
+            artifactId = providers.gradleProperty("artifactId").get()
+            version = providers.gradleProperty("version").get()
 
             from(components["java"])
         }
+
+//        create<MavenPublication>("mavenJava") {
+//            pom {
+//                name = "Olvid Bot Java Client"
+//                groupId = providers.gradleProperty("groupId").get()
+//                artifactId = providers.gradleProperty("artifactId").get()
+//                description = "A grpc client implementation to interact with an Olvid Daemon"
+//                url = "https://doc.bot.olvid.io"
+//                developers {
+//                    developer {
+//                        email = "bot@olvid.io"
+//                    }
+//                }
+//            }
+//
+//            from(components["java"])
+//        }
     }
 }
