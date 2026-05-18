@@ -1,6 +1,10 @@
 package io.olvid.daemon.client;
 
 import io.olvid.daemon.command.v1.*;
+import io.olvid.daemon.datatypes.v1.Discussion;
+import io.olvid.daemon.datatypes.v1.Message;
+import io.olvid.daemon.notification.v1.MessageSentNotification;
+import io.olvid.daemon.notification.v1.SubscribeToMessageSentNotification;
 import org.junit.jupiter.api.*;
 
 import java.util.concurrent.TimeUnit;
@@ -78,5 +82,31 @@ class OlvidClientTest {
         while (iterator.hasNext()) {
             assertNotNull(iterator.next());
         }
+    }
+
+    @Test
+    @DisplayName("OnMessageSent: notificaton test")
+    void messageSentNotification() {
+        var iterator = client.stubs.discussionCommand.discussionList(DiscussionListRequest.newBuilder().build());
+        Discussion discussion = null;
+        while (iterator.hasNext()) {
+            discussion = iterator.next().getDiscussions(0);
+        }
+        assertNotNull(discussion);
+
+        Message[] sentMessage = new Message[1];
+
+        client.stubs.messageNotification.messageSent(SubscribeToMessageSentNotification.newBuilder().setCount(1).build(), new NotificationObserver<>() {
+            @Override
+            public void onNext(MessageSentNotification notification) {
+                System.out.println("message sent: " + notification.getMessage());
+                assertNotNull(sentMessage[0]);
+                assertEquals(notification.getMessage().getId(), sentMessage[0].getId());
+                assertEquals(notification.getMessage().getBody(), sentMessage[0].getBody());
+                assertEquals(notification.getMessage().getDiscussionId(), sentMessage[0].getDiscussionId());
+            }
+        });
+
+        sentMessage[0] = client.stubs.messageCommand.messageSend(MessageSendRequest.newBuilder().setDiscussionId(discussion.getId()).setBody("Automatic message from java client tests").build()).getMessage();
     }
 }
