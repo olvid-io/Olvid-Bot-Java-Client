@@ -1,10 +1,13 @@
 package io.olvid.daemon.client;
 
+import io.grpc.StatusException;
+import io.grpc.stub.BlockingClientCall;
 import io.olvid.daemon.command.v1.*;
 import io.olvid.daemon.datatypes.v1.Discussion;
 import io.olvid.daemon.datatypes.v1.Message;
 import io.olvid.daemon.notification.v1.MessageSentNotification;
 import io.olvid.daemon.notification.v1.SubscribeToMessageSentNotification;
+import io.olvid.daemon.services.v1.MessageNotificationServiceGrpc;
 import org.junit.jupiter.api.*;
 
 import java.util.concurrent.TimeUnit;
@@ -86,27 +89,21 @@ class OlvidClientTest {
 
     @Test
     @DisplayName("OnMessageSent: notificaton test")
-    void messageSentNotification() {
+    void messageSentNotification() throws StatusException, InterruptedException {
+        OlvidClient client = OlvidClient.newBuilder().build();
         var iterator = client.stubs.discussionCommand.discussionList(DiscussionListRequest.newBuilder().build());
         Discussion discussion = null;
         while (iterator.hasNext()) {
             discussion = iterator.next().getDiscussions(0);
         }
-        assertNotNull(discussion);
+        assert discussion != null;
 
-        Message[] sentMessage = new Message[1];
-
-        client.stubs.messageNotification.messageSent(SubscribeToMessageSentNotification.newBuilder().setCount(1).build(), new NotificationObserver<>() {
-            @Override
-            public void onNext(MessageSentNotification notification) {
-                System.out.println("message sent: " + notification.getMessage());
-                assertNotNull(sentMessage[0]);
-                assertEquals(notification.getMessage().getId(), sentMessage[0].getId());
-                assertEquals(notification.getMessage().getBody(), sentMessage[0].getBody());
-                assertEquals(notification.getMessage().getDiscussionId(), sentMessage[0].getDiscussionId());
-            }
-        });
-
-        sentMessage[0] = client.stubs.messageCommand.messageSend(MessageSendRequest.newBuilder().setDiscussionId(discussion.getId()).setBody("Automatic message from java client tests").build()).getMessage();
+        BlockingClientCall<?, MessageSentNotification> messageSentBlockingClientCall = MessageNotificationServiceGrpc.newBlockingV2Stub(client.channel).messageSent(SubscribeToMessageSentNotification.newBuilder().setCount(1).build());
+        Message sentMessage = client.stubs.messageCommand.messageSend(MessageSendRequest.newBuilder().setDiscussionId(discussion.getId()).setBody("Automatic message from java client tests").build()).getMessage();
+        MessageSentNotification messageSentNotification = messageSentBlockingClientCall.read();
+        assert messageSentNotification != null;
+        assert messageSentNotification.getMessage().getId().equals(sentMessage.getId());
+        assert messageSentNotification.getMessage().getBody().equals(sentMessage.getBody());
+        System.out.println("Notification received: MESSAGE_SENT !");
     }
 }
